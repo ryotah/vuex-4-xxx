@@ -1,5 +1,7 @@
 # vuex-4-xxx
 
+Examples to make Vuex 4 type-safe.
+
 ## Project setup
 ```
 npm install
