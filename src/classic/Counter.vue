@@ -6,25 +6,21 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapGetters, mapActions, mapState } from "vuex";
+import { accessor } from "@/store";
+
+const { counter: mapper } = accessor;
 
 export default defineComponent({
   computed: {
-    ...mapState({
-      // Note:
-      // You can also add a type annotation like `state: CounterState`.
-      // However it may be a little annoying for everyday development.
-      count: (state: any) => state.counter.count
-    }),
-    ...mapGetters(["evenOrOdd"])
+    count: () => mapper.count,
+    evenOrOdd: () => mapper.evenOrOdd
   },
   methods: {
-    ...mapActions(["increment", "decrement"]),
     onIncrement() {
-      this.increment(1);
+      mapper.increment(1);
     },
     onDecrement() {
-      this.decrement(1);
+      mapper.decrement(1);
     }
   }
 });

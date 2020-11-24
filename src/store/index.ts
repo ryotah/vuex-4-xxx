@@ -1,27 +1,27 @@
-import { InjectionKey } from "vue";
-import { ActionTree, createStore, Store } from "vuex";
-import counter, { State as counterState } from "./counter";
-import messageList, { State as messageListState } from "./message-list";
-import ui, { State as uiState } from "./ui";
+import { createStore, createLogger } from "vuex";
+import counter from "./counter";
+import messageList from "./message-list";
+import ui from "./ui";
+import { useAccessor, actionTree } from "typed-vuex";
 
-export type RootState = {
-  counter: counterState;
-  messageList: messageListState;
-  ui: uiState;
-};
-
-const actions: ActionTree<{}, RootState> = {
-  reset({ dispatch }) {
-    dispatch("messageList/reset");
-    // dispatch("xxx/reset");
-    // ...
-    //
-    // Note:
-    // Or each module catches this event.
+const actions = actionTree(
+  {
+    state: {}
+  },
+  {
+    reset() {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      accessor.messageList.reset();
+      // accessor.xxx.reset();
+      // ...
+      //
+      // Note:
+      // Or each module catches this event.
+    }
   }
-};
+);
 
-export default createStore({
+const storePattern = {
   actions,
   modules: {
     counter,
@@ -29,8 +29,11 @@ export default createStore({
     ui
   },
   strict: true,
-  devtools: true
-});
+  devtools: true,
+  plugins: [createLogger()]
+};
+const store = createStore(storePattern);
 
-// Define an injection key
-export const storeKey: InjectionKey<Store<RootState>> = Symbol();
+export const accessor = useAccessor(store, storePattern);
+
+export default store;

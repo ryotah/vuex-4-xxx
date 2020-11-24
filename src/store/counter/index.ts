@@ -1,5 +1,4 @@
-import { ActionTree, MutationTree, GetterTree } from "vuex";
-import { RootState } from "@/store";
+import { getterTree, mutationTree, actionTree } from "typed-vuex";
 
 export function initialState() {
   return {
@@ -7,15 +6,13 @@ export function initialState() {
   };
 }
 
-export type State = ReturnType<typeof initialState>;
-
-const getters: GetterTree<State, RootState> = {
+const getters = getterTree(initialState, {
   evenOrOdd(state) {
     return state.count % 2 === 0 ? "even" : "odd";
   }
-};
+});
 
-const mutations: MutationTree<State> = {
+const mutations = mutationTree(initialState, {
   increment(state, payload: number) {
     state.count += payload;
   },
@@ -25,19 +22,22 @@ const mutations: MutationTree<State> = {
   reset(state) {
     state.count = 0;
   }
-};
+});
 
-const actions: ActionTree<State, RootState> = {
-  increment({ commit }, payload: number) {
-    commit("increment", payload);
-  },
-  decrement({ commit }, payload: number) {
-    commit("decrement", payload);
-  },
-  reset({ commit }) {
-    commit("reset");
+const actions = actionTree(
+  { state: initialState, getters, mutations },
+  {
+    increment({ commit }, payload: number) {
+      commit("increment", payload);
+    },
+    decrement({ commit }, payload: number) {
+      commit("decrement", payload);
+    },
+    reset({ commit }) {
+      commit("reset");
+    }
   }
-};
+);
 
 export default {
   // Note: No namespace for comparison.

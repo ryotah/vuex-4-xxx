@@ -10,10 +10,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapGetters, mapActions, mapState } from "vuex";
-// Note:
-// You can also use `createNamespacedHelpers`
-// const { mapState, mapActions } = createNamespacedHelpers('some/nested/module')
+import { accessor } from "@/store";
+
+const { messageList: mapper } = accessor;
 
 export default defineComponent({
   data() {
@@ -22,19 +21,12 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState("messageList", ["messages"]),
-    ...mapGetters("messageList", ["unread"])
+    messages: () => mapper.messages,
+    unread: () => mapper.unread
   },
   methods: {
-    ...mapActions("messageList", ["addMessage"]),
     onClickAddMessage() {
-      // Note:
-      // If you use `dispatch` directly, it will be the following.
-      // this.$store.dispatch("messageList/addMessage", {
-      //   value: this.template,
-      //   read: false
-      // });
-      this.addMessage({
+      mapper.addMessage({
         value: this.template,
         read: false
       });

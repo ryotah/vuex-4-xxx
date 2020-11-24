@@ -40,12 +40,16 @@ export default defineComponent({
   },
   computed: {
     loading() {
-      return this.$store.state.ui.loading;
+      return this.$accessor.ui.loading;
+
+      // Note: In this case `uiuiui` is `any` so that it doesn't seem to be an error.
+      // (I wish it were an error. However, this problem seems to occur only in the top-level fields.)
+      // return this.$accessor.uiuiui.loading;
     }
   },
   methods: {
     onReset() {
-      this.$store.dispatch("reset");
+      this.$accessor.reset();
     }
   }
 });

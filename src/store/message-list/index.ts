@@ -1,16 +1,12 @@
-import { ActionTree, MutationTree, GetterTree } from "vuex";
-import { RootState } from "@/store";
+import { getterTree, mutationTree, actionTree } from "typed-vuex";
+import { accessor } from "@/store";
 
 export type Message = {
   value: string;
   read: boolean;
 };
 
-export type State = {
-  messages: Message[];
-};
-
-function initialState(): State {
+export function initialState(): { messages: Message[] } {
   return {
     messages: [
       {
@@ -21,34 +17,37 @@ function initialState(): State {
   };
 }
 
-const getters: GetterTree<State, RootState> = {
+const getters = getterTree(initialState, {
   unread(state) {
     return state.messages.filter(message => message.read);
   }
-};
+});
 
-const mutations: MutationTree<State> = {
+const mutations = mutationTree(initialState, {
   addMessage(state, payload: Message) {
     state.messages.push(payload);
   },
   reset(state) {
     Object.assign(state, initialState());
   }
-};
+});
 
-const actions: ActionTree<State, RootState> = {
-  async addMessage({ commit }, payload: Message) {
-    commit("ui/showLoading", null, { root: true });
-    commit(
-      "addMessage",
-      await new Promise(resolve => setTimeout(() => resolve(payload), 300))
-    );
-    commit("ui/hideLoading", null, { root: true });
-  },
-  reset({ commit }) {
-    commit("reset");
+const actions = actionTree(
+  { state: initialState, mutations },
+  {
+    async addMessage({ commit }, payload: Message) {
+      accessor.ui.showLoading();
+      commit(
+        "addMessage",
+        await new Promise(resolve => setTimeout(() => resolve(payload), 300))
+      );
+      accessor.ui.hideLoading();
+    },
+    reset({ commit }) {
+      commit("reset");
+    }
   }
-};
+);
 
 export default {
   namespaced: true,
