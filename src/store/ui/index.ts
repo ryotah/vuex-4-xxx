@@ -1,33 +1,48 @@
-import { ActionTree, MutationTree } from "vuex";
-import { RootState } from "@/store";
+import {
+  Actions,
+  Mutations,
+  Getters,
+  Module,
+  createMapper
+} from "vuex-smart-module";
 
-export function initialState() {
-  return { loading: false };
+class LocalState {
+  loading = false;
 }
 
-export type State = ReturnType<typeof initialState>;
+class LocalGetters extends Getters<LocalState> {}
 
-const mutations: MutationTree<State> = {
-  showLoading(state) {
-    state.loading = true;
-  },
-  hideLoading(state) {
-    state.loading = false;
+class LocalMutations extends Mutations<LocalState> {
+  showLoading() {
+    this.state.loading = true;
   }
-};
-
-const actions: ActionTree<State, RootState> = {
-  showLoading({ commit }) {
-    commit("showLoading");
-  },
-  hideLoading({ commit }) {
-    commit("hideLoading");
+  hideLoading() {
+    this.state.loading = false;
   }
-};
+}
 
-export default {
-  namespaced: true,
-  state: initialState,
-  actions,
-  mutations
-};
+class LocalActions extends Actions<
+  LocalState,
+  LocalGetters,
+  LocalMutations,
+  LocalActions
+> {
+  showLoading() {
+    this.commit("showLoading");
+  }
+  hideLoading() {
+    this.commit("hideLoading");
+  }
+}
+
+const module = new Module({
+  state: LocalState,
+  getters: LocalGetters,
+  mutations: LocalMutations,
+  actions: LocalActions
+});
+
+// Create mapper
+export const uiMapper = createMapper(module);
+
+export default module;

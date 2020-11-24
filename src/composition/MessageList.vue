@@ -9,23 +9,24 @@
 </template>
 
 <script lang="ts">
-import { storeKey } from "@/store";
 import { computed, defineComponent } from "vue";
-import { useStore } from "vuex";
+import { context } from "@/store";
+
+const { messageList: mapper } = context.modules;
 
 export default defineComponent({
   setup() {
-    const { state, getters, dispatch } = useStore(storeKey);
     const template = "Hey there! 👋";
 
     return {
-      messages: computed(() => state.messageList.messages),
-      unread: computed(() => getters["messageList/unread"]),
+      messages: computed(() => mapper.state.messages),
+      unread: computed(() => mapper.getters.unread),
       onClickAddMessage: () =>
-        dispatch("messageList/addMessage", {
+        mapper.actions.addMessage({
           value: template,
           read: false
         })
+      // Or mapper.dispatch("addMessage", { ... })
     };
   }
 });

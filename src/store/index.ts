@@ -1,36 +1,33 @@
-import { InjectionKey } from "vue";
-import { ActionTree, createStore, Store } from "vuex";
-import counter, { State as counterState } from "./counter";
-import messageList, { State as messageListState } from "./message-list";
-import ui, { State as uiState } from "./ui";
+import { createLogger } from "vuex";
+import { Actions, Module, createStore } from "vuex-smart-module";
+import counter from "./counter";
+import messageList from "./message-list";
+import ui from "./ui";
 
-export type RootState = {
-  counter: counterState;
-  messageList: messageListState;
-  ui: uiState;
-};
-
-const actions: ActionTree<{}, RootState> = {
-  reset({ dispatch }) {
-    dispatch("messageList/reset");
-    // dispatch("xxx/reset");
+class IndexActions extends Actions {
+  reset() {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    context.modules.messageList.dispatch("reset"); // Or context.modules.messageList.actions.reset();
+    // context.modules.xxx.dispatch("reset");;
     // ...
     //
     // Note:
-    // Or each module catches this event.
+    // ~~Or each module catches this event.~~
   }
-};
+}
 
-export default createStore({
-  actions,
-  modules: {
-    counter,
-    messageList,
-    ui
-  },
-  strict: true,
-  devtools: true
+export const root = new Module({
+  actions: IndexActions,
+  modules: { counter, messageList, ui }
 });
 
-// Define an injection key
-export const storeKey: InjectionKey<Store<RootState>> = Symbol();
+const store = createStore(root, {
+  strict: true,
+  devtools: true,
+  plugins: [createLogger()]
+});
+
+// Get root context
+export const context = root.context(store);
+
+export default store;

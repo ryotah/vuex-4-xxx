@@ -5,19 +5,19 @@
 </template>
 
 <script lang="ts">
-import { storeKey } from "@/store";
 import { computed, defineComponent } from "vue";
-import { useStore } from "vuex";
+
+import { context } from "@/store";
+
+const { counter: mapper } = context.modules;
 
 export default defineComponent({
   setup() {
-    const { state, getters, dispatch } = useStore(storeKey);
-
     return {
-      count: computed(() => state.counter.count),
-      evenOrOdd: computed(() => getters["evenOrOdd"]),
-      onIncrement: () => dispatch("increment", 1),
-      onDecrement: () => dispatch("decrement", 1)
+      count: computed(() => mapper.state.count),
+      evenOrOdd: computed(() => mapper.getters["evenOrOdd"]),
+      onIncrement: () => mapper.dispatch("increment", 1),
+      onDecrement: () => mapper.dispatch("decrement", 1)
     };
   }
 });

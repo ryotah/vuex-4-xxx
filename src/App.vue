@@ -31,6 +31,8 @@ import MessageListClassic from "@/classic/MessageList.vue";
 import Counter from "@/composition/Counter.vue";
 import MessageList from "@/composition/MessageList.vue";
 
+import { context } from "@/store";
+
 export default defineComponent({
   components: {
     CounterClassic,
@@ -39,13 +41,13 @@ export default defineComponent({
     MessageList
   },
   computed: {
-    loading() {
-      return this.$store.state.ui.loading;
+    loading(): boolean {
+      return context.modules.ui.state.loading;
     }
   },
   methods: {
     onReset() {
-      this.$store.dispatch("reset");
+      context.dispatch("reset");
     }
   }
 });

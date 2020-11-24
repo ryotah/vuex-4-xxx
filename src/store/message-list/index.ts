@@ -1,59 +1,68 @@
-import { ActionTree, MutationTree, GetterTree } from "vuex";
-import { RootState } from "@/store";
+import {
+  Actions,
+  Mutations,
+  Getters,
+  Module,
+  createMapper
+} from "vuex-smart-module";
+import { context } from "@/store";
 
 export type Message = {
   value: string;
   read: boolean;
 };
 
-export type State = {
-  messages: Message[];
-};
-
-function initialState(): State {
-  return {
-    messages: [
-      {
-        value: "What's going on? 👋",
-        read: true
-      }
-    ]
-  };
+class LocalState {
+  messages: Message[] = [
+    {
+      value: "What's going on? 👋",
+      read: true
+    }
+  ];
 }
 
-const getters: GetterTree<State, RootState> = {
-  unread(state) {
-    return state.messages.filter(message => message.read);
+class LocalGetters extends Getters<LocalState> {
+  get unread() {
+    return this.state.messages.filter(message => message.read);
   }
-};
+}
 
-const mutations: MutationTree<State> = {
-  addMessage(state, payload: Message) {
-    state.messages.push(payload);
-  },
-  reset(state) {
-    Object.assign(state, initialState());
+class LocalMutations extends Mutations<LocalState> {
+  addMessage(payload: Message) {
+    this.state.messages.push(payload);
   }
-};
+  reset() {
+    Object.assign(this.state, new LocalState());
+  }
+}
 
-const actions: ActionTree<State, RootState> = {
-  async addMessage({ commit }, payload: Message) {
-    commit("ui/showLoading", null, { root: true });
-    commit(
+class LocalActions extends Actions<
+  LocalState,
+  LocalGetters,
+  LocalMutations,
+  LocalActions
+> {
+  async addMessage(payload: Message) {
+    context.modules.ui.commit("showLoading");
+    this.commit(
       "addMessage",
       await new Promise(resolve => setTimeout(() => resolve(payload), 300))
     );
-    commit("ui/hideLoading", null, { root: true });
-  },
-  reset({ commit }) {
-    commit("reset");
+    context.modules.ui.commit("hideLoading");
   }
-};
+  reset() {
+    this.commit("reset");
+  }
+}
 
-export default {
-  namespaced: true,
-  state: initialState,
-  getters,
-  actions,
-  mutations
-};
+const module = new Module({
+  state: LocalState,
+  getters: LocalGetters,
+  mutations: LocalMutations,
+  actions: LocalActions
+});
+
+// Create mapper
+export const messageListMapper = createMapper(module);
+
+export default module;
