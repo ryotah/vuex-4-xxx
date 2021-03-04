@@ -2,6 +2,13 @@
 
 Examples to make Vuex 4 type-safe.
 
+## Examples
+
+- https://github.com/ryotah/vuex-4-xxx/tree/examples/typed-vuex
+  - This example is using https://github.com/danielroe/typed-vuex
+- https://github.com/ryotah/vuex-4-xxx/tree/examples/vuex-smart-module
+  - This example is using https://github.com/ktsn/vuex-smart-module
+
 ## Project setup
 ```
 npm install
